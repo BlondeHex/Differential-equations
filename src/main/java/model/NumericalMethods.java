@@ -29,7 +29,7 @@ public class NumericalMethods {
     private void methodAdams(){
         double h = equation.getH();
         for (int i=3; i<valueTable.length-1; i++){
-            double nextY = valueTable[i][1] + h * getDeltaFi(i + 1) +
+            double nextY = valueTable[i][1] + h * getFi(i + 1) +
                     Math.pow(h,2)/2*getDeltaFi(i+1) +
                     5*Math.pow(h,3)/12*getDelta2Fi(i+1) +
                     3*Math.pow(h,4)/8*getDelta3Fi(i+1);

@@ -2,6 +2,7 @@ package model;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
+import org.apache.commons.math3.util.Precision;
 
 public class ApproximationMethod {
 
@@ -19,8 +20,8 @@ public class ApproximationMethod {
         String powerFunction = power(data);
         double powerFunctionSquare = findSquareDeviations(data, powerFunction);
         if (minSquare>powerFunctionSquare){
-            function = linearFunction;
-            minSquare = linearFunctionSquare;
+            function = powerFunction;
+            minSquare = powerFunctionSquare;
         }
 
         String squareFunction = square(data);
@@ -28,6 +29,27 @@ public class ApproximationMethod {
         if (minSquare>squareFunctionSquare){
             function = squareFunction;
             minSquare = squareFunctionSquare;
+        }
+
+        String logFunction = log(data);
+        double logFunctionSquare = findSquareDeviations(data, logFunction);
+        if (minSquare>logFunctionSquare){
+            function = logFunction;
+            minSquare = logFunctionSquare;
+        }
+
+        String expFunction = exp(data);
+        double expFunctionSquare = findSquareDeviations(data, expFunction);
+        if (minSquare>expFunctionSquare){
+            function = expFunction;
+            minSquare = expFunctionSquare;
+        }
+
+        String indicativeFunction = indicative(data);
+        double indicativeFunctionSquare = findSquareDeviations(data, indicativeFunction);
+        if (minSquare>indicativeFunctionSquare){
+            function = indicativeFunction;
+            minSquare = indicativeFunctionSquare;
         }
 
         String hyperbolaFunction = hyperbola(data);
@@ -40,8 +62,7 @@ public class ApproximationMethod {
 
     private double findSquareDeviations(Double[][] data, String function){
         double sum = 0;
-        for (int i=0; i<data.length; i++)
-            sum += Math.pow(data[i][1]-getValueFunction(function,data[i][0]),2);
+        for (Double[] datum : data) sum += Math.pow(datum[1] - getValueFunction(function, datum[0]), 2);
         return sum;
     }
 
@@ -63,9 +84,9 @@ public class ApproximationMethod {
 
     private String linear(Double[][] data){
         Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (int i = 0; i < data.length; i++) {
-            sum[0] += data[i][0]; //x
-            sum[1] += data[i][1]; //y
+        for (Double[] datum : data) {
+            sum[0] += datum[0]; //x
+            sum[1] += datum[1]; //y
             sum[2] += sum[0] * sum[1]; //xy
             sum[3] += Math.pow(sum[0], 2.0); //x2
         }
@@ -81,9 +102,9 @@ public class ApproximationMethod {
 
     private String square(Double[][] data) {
         Double[] sum = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-        for (int i = 0; i < data.length; i++) {
-            double x = data[i][0];
-            double y = data[i][1];
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
             sum[0] += x; //x
             sum[1] += y; //y
             sum[2] += Math.pow(x, 2.0); //x2
@@ -144,9 +165,9 @@ public class ApproximationMethod {
 
     private String power(Double[][] data) {
         Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (int i = 0; i < data.length; i++) {
-            double x = data[i][0];
-            double y = data[i][1];
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
             sum[0] += Math.log(x); //x
             sum[1] += Math.log(y); //y
             sum[2] += Math.pow(Math.log(x), 2); //x2
@@ -160,9 +181,9 @@ public class ApproximationMethod {
 
     private String hyperbola(Double[][] data) {
         Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (int i = 0; i < data.length; i++) {
-            double x = data[i][0];
-            double y = data[i][1];
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
             sum[0] += 1 / x; //x
             sum[1] += 1 / Math.pow(x, 2.0); //x2
             sum[2] += y / x; //yx
@@ -176,6 +197,68 @@ public class ApproximationMethod {
         } else {
             return a + "" + b + "/x";
         }
+    }
+
+    private String indicative(Double[][] data) {
+        Double[] sum = {0.0, 0.0, 0.0, 0.0};
+
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
+            sum[0] += x; //x
+            sum[1] += Math.pow(x,2); //x2
+            sum[2] += Math.log(y); //lny
+            sum[3] += x * sum[2]; //xlny
+        }
+
+        double b = Math.exp((data.length * sum[3] - sum[0] * sum[2]) / (data.length * sum[1] - Math.pow(sum[0],2)));
+        double a = Math.exp(1.0/data.length * sum[2] - Math.log(b)/data.length * sum[0]);
+        return a +"*" + b + "^ x";
+    }
+
+    private String log(Double[][] data) {
+        Double[] sum = {0.0, 0.0, 0.0, 0.0};
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
+            sum[0] += y * Math.log(x); //ylnx
+            sum[1] += Math.log(x); //lnx
+            sum[2] += y; //y
+            sum[3] += Math.pow(Math.log(x),2); //ln2x
+        }
+
+        double b =  (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1],2));
+        double a =  1.0/data.length * sum[2] - b/data.length * sum[1];
+        String result =a+"";
+        if (b >= 0) {
+            result+="+"+b +"*log(x)";
+        } else if (b!=0) {
+            result+=b+"*log(x)";
+        }
+        return result;
+    }
+
+    private String exp(Double[][] data) {
+        Double[] sum = {0.0, 0.0, 0.0, 0.0};
+
+        for (Double[] datum : data) {
+            double x = datum[0];
+            double y = datum[1];
+            sum[0] += x * Math.log(y); //xlny
+            sum[1] += x; //x
+            sum[2] += Math.log(y); //lny
+            sum[3] +=Math.pow(x,2); //x2
+        }
+
+        double b =  (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1],2));
+        double a =  1.0/data.length * sum[2] - b/data.length * sum[1];
+        String result ="e^("+a;
+        if (b >= 0) {
+            result+="+"+b+"* x)";
+        } else if (b!=0){
+            result+=b +"* x)";
+        }
+        return result;
     }
 
 
