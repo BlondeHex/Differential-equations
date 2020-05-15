@@ -77,29 +77,41 @@ public class Chart extends JPanel {
         int distanceYFromCenter = this.centerY - (int) this.coefficientY /2;
         double xCounter = 0.5;
         double yCounter = 0.5;
+        double countSeparatorX = xCounter;
+        double countSeparatorY = yCounter;
         boolean isNumberShouldShowLeft = true;
+        if (max(abs(maxX), abs(minX)) > 10.0) {
+            countSeparatorX = (int) (max(abs(maxX), abs(minX)) / 10);
+        }
+        if (max(abs(maxY), abs(minY)) > 10.0) {
+            countSeparatorY = (int) (max(abs(maxY), abs(minY))/10);
+        }
 
         while (distanceXFromCenter<this.plotWidth) {
-            if (isNumberShouldShowLeft) {
-                graphics.drawString(xCounter + "", distanceXFromCenter, this.centerY - 5);
-                isNumberShouldShowLeft = false;
-            } else {
-                graphics.drawString(xCounter + "", distanceXFromCenter, this.centerY + 15);
-                isNumberShouldShowLeft = true;
+            if (xCounter % countSeparatorX == 0) {
+                if (isNumberShouldShowLeft) {
+                    graphics.drawString(xCounter + "", distanceXFromCenter, this.centerY - 5);
+                    isNumberShouldShowLeft = false;
+                } else {
+                    graphics.drawString(xCounter + "", distanceXFromCenter, this.centerY + 15);
+                    isNumberShouldShowLeft = true;
 
+                }
             }
             xCounter+=0.5;
             distanceXFromCenter+=(int) (this.coefficientX /2);
         }
 
         while (distanceYFromCenter>0) {
-            if (isNumberShouldShowLeft) {
-                isNumberShouldShowLeft = false;
-                graphics.drawString(yCounter + "", this.centerX - 24, distanceYFromCenter);
-            } else {
-                graphics.drawString(yCounter + "", this.centerX + 4, distanceYFromCenter);
-                isNumberShouldShowLeft = true;
+            if (yCounter % countSeparatorY == 0) {
+                if (isNumberShouldShowLeft) {
+                    isNumberShouldShowLeft = false;
+                    graphics.drawString(yCounter + "", this.centerX - 24, distanceYFromCenter);
+                } else {
+                    graphics.drawString(yCounter + "", this.centerX + 4, distanceYFromCenter);
+                    isNumberShouldShowLeft = true;
 
+                }
             }
             yCounter+=0.5;
             distanceYFromCenter-=(int) (this.coefficientY /2);
