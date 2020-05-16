@@ -12,15 +12,17 @@ public class Equation {
     private int iterations;
 
     public Equation(double x0, double y0, double xn, double h, String function){
-        iterations = (int)(Math.ceil((xn-x0)/h));
+
+        this.h=Math.pow(h, 0.25);
+        //this.h = h;
+        iterations = (int)(Math.ceil((xn-x0)/this.h));
         valueTable = new Double[iterations+1][2];
         valueTable[0][0]= x0;
         valueTable[0][1]= y0;
         this.xn=xn;
-        this.h=h;
         this.function=function;
         for (int i=1; i<iterations; i++){
-            valueTable[i][0] = Precision.round(valueTable[i-1][0]+h,6);
+            valueTable[i][0] = Precision.round(valueTable[i-1][0]+this.h,6);
         }
         valueTable[iterations][0]=xn;
     }

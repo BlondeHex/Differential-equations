@@ -39,7 +39,7 @@ public class MainView {
         jPanel.setLayout(new GridBagLayout());
         GridBagConstraints baseConstraints = new GridBagConstraints();
 
-        JLabel descriptionFunctionLabel = new JLabel("y + f(x,y) = 0");
+        JLabel descriptionFunctionLabel = new JLabel("y' = f(x,y) ");
         descriptionFunctionLabel.setFont(new Font(descriptionFunctionLabel.getFont().getName(), Font.BOLD, 14));
         JLabel functionLabel = new JLabel("f(x,y) =");
         functionField = new JTextField(15);

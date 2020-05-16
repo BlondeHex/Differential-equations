@@ -45,13 +45,6 @@ public class ApproximationMethod {
             minSquare = expFunctionSquare;
         }
 
-        String indicativeFunction = indicative(data);
-        double indicativeFunctionSquare = findSquareDeviations(data, indicativeFunction);
-        if (minSquare>indicativeFunctionSquare){
-            function = indicativeFunction;
-            minSquare = indicativeFunctionSquare;
-        }
-
         String hyperbolaFunction = hyperbola(data);
         double hyperbolaFunctionSquare = findSquareDeviations(data, hyperbolaFunction);
         if (minSquare>hyperbolaFunctionSquare)
@@ -87,8 +80,8 @@ public class ApproximationMethod {
         for (Double[] datum : data) {
             sum[0] += datum[0]; //x
             sum[1] += datum[1]; //y
-            sum[2] += sum[0] * sum[1]; //xy
-            sum[3] += Math.pow(sum[0], 2.0); //x2
+            sum[2] += datum[0] * datum[1]; //xy
+            sum[3] += Math.pow(datum[0], 2.0); //x2
         }
         double del = Math.pow(sum[0], 2.0) - data.length * sum[3];
         double a = (sum[0] * sum[1] - data.length * sum[2]) / del;
@@ -199,22 +192,6 @@ public class ApproximationMethod {
         }
     }
 
-    private String indicative(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
-
-        for (Double[] datum : data) {
-            double x = datum[0];
-            double y = datum[1];
-            sum[0] += x; //x
-            sum[1] += Math.pow(x,2); //x2
-            sum[2] += Math.log(y); //lny
-            sum[3] += x * sum[2]; //xlny
-        }
-
-        double b = Math.exp((data.length * sum[3] - sum[0] * sum[2]) / (data.length * sum[1] - Math.pow(sum[0],2)));
-        double a = Math.exp(1.0/data.length * sum[2] - Math.log(b)/data.length * sum[0]);
-        return a +"*" + b + "^ x";
-    }
 
     private String log(Double[][] data) {
         Double[] sum = {0.0, 0.0, 0.0, 0.0};

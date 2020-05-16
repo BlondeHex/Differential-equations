@@ -4,6 +4,7 @@ import model.NumericalMethods;
 import views.ChartView;
 import views.MainView;
 import model.Equation;
+import views.TableView;
 
 public class MainController {
     private MainView view;
@@ -16,6 +17,7 @@ public class MainController {
         view.getButton().addActionListener(li -> {
             Double[][] data = dataProcessing();
             new ChartView(data);
+            new TableView(data);
         });
     }
 
