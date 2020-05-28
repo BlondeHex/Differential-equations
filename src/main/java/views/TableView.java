@@ -1,8 +1,5 @@
 package views;
 
-import component.Chart;
-import model.ApproximationMethod;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;

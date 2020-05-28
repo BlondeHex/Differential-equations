@@ -2,7 +2,6 @@ package model;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
-import org.apache.commons.math3.util.Precision;
 
 public class ApproximationMethod {
 
