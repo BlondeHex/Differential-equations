@@ -4,6 +4,9 @@ import java.awt.*;
 import java.util.Vector;
 
 public class MainView {
+    private JLabel errorLabel;
+    private JLabel minSquareLabel;
+
     private JFrame window;
     private JPanel view;
     private JScrollPane panelTable;
@@ -42,6 +45,9 @@ public class MainView {
         view.setLayout(new GridBagLayout());
         GridBagConstraints baseConstraints = new GridBagConstraints();
         JPanel inputPanel = setInputPanel();
+        errorLabel = new JLabel("");
+        minSquareLabel = new JLabel("");
+        errorLabel.setForeground(Color.red);
         panelTable = initTable(new double[][]{});
 
         panelChart = new JPanel();
@@ -51,9 +57,11 @@ public class MainView {
         view.add(inputPanel, baseConstraints);
         baseConstraints.gridy = 1;
         baseConstraints.gridx = 0;
+        view.add(errorLabel);
         view.add(panelTable, baseConstraints);
         baseConstraints.gridx = 1;
         view.add(panelChart, baseConstraints);
+        view.add(minSquareLabel);
     }
 
     private JPanel setInputPanel(){
@@ -202,6 +210,12 @@ public class MainView {
         return functionField;
     }
 
+    public JLabel getErrorLabel() {
+        return errorLabel;
+    }
+    public JLabel getMinSquareLabel()  {
+        return minSquareLabel;
+    }
 
     public JPanel getPanelChart() {
         return panelChart;

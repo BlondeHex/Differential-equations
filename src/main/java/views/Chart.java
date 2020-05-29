@@ -1,6 +1,8 @@
 package views;
 
 import model.ApproximationMethod;
+import model.Function;
+import model.Type;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.jfree.chart.ChartFactory;
@@ -24,20 +26,19 @@ public class Chart {
     private XYDataset first;
     private DefaultXYDataset points;
     private double[][] data;
-    private String function;
+    private Function function;
 
 
-    public Chart(double[][] data){
-        this.data = data;
-        ApproximationMethod approximationMethod = new ApproximationMethod();
-        function = approximationMethod.run(data);
+    public Chart(Function function) {
+        this.function = function;
+        this.data = function.getData();
         setDataset();
         jPanel = setElement();
 
     }
 
 
-    private JPanel setElement(){
+    private JPanel setElement() {
         JPanel jPanel = new JPanel();
         jPanel.add(createPanel());
         return jPanel;
@@ -62,32 +63,32 @@ public class Chart {
     }
 
     private void setDataset() {
-
-        Expression formula1 = new ExpressionBuilder(function).variable("x").build();
+        System.out.println(function.getFunction());
+        Expression formula1 = new ExpressionBuilder(function.getFunction()).variable("x").build();
         double[][] borders = getLeftAndRightBorders();
         double leftBorder, rightBorder;
 
-            leftBorder = borders[0][1] - 15;
-            rightBorder = borders[0][0] + 15;
-            first = DatasetUtilities.sampleFunction2D(
-                new Function(formula1),
+        leftBorder = borders[0][1] - function.getType().getBias();
+        rightBorder = borders[0][0] + function.getType().getBias();
+        if (function.getType() == Type.LOG && leftBorder <= 0) leftBorder = 0.01;
+
+        first = DatasetUtilities.sampleFunction2D(
+                new FunctionSolver(formula1, function.getType()),
                 leftBorder,
                 rightBorder,
                 300,
-                function
+                function.getFunction()
         );
 
-            points = new DefaultXYDataset();
+        points = new DefaultXYDataset();
         double[] x = new double[data.length];
         double[] y = new double[data.length];
-        for (int i = 0; i<data.length; i++) {
-                y[i] = data[i][0];
-                x[i] = data[i][1];
+        for (int i = 0; i < data.length; i++) {
+            y[i] = data[i][0];
+            x[i] = data[i][1];
         }
 
-        double[][] p = {y, x};
-
-        points.addSeries("Точки", p);
+        points.addSeries("Точки", new double[][]{y, x});
     }
 
 
@@ -108,12 +109,11 @@ public class Chart {
         XYPlot plot = (XYPlot) chart.getPlot();
 
         plot.setRenderer(0, new XYLineAndShapeRenderer());
-        XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer(0);
-        r.setSeriesLinesVisible(0, false);
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+        renderer.setSeriesLinesVisible(0, false);
 
         plot.setDataset(1, first);
         plot.setRenderer(1, new StandardXYItemRenderer());
-
 
 
         plot.getDomainAxis().setLowerMargin(0.0);
@@ -122,24 +122,27 @@ public class Chart {
     }
 
     private double[][] getLeftAndRightBorders() {
-        double max = -Integer.MAX_VALUE + 0.0;
-        double min = Integer.MAX_VALUE + 0.0;
+        double max = (double)-Integer.MAX_VALUE;
+        double min = (double)Integer.MAX_VALUE;
         for (double[] i : data) {
-            if (i[0]>max) max = i[0];
-            if (i[0]<min) min = i[0];
+            if (i[0] > max) max = i[0];
+            if (i[0] < min) min = i[0];
         }
-        return new double[][]{{max,min}};
+        return new double[][]{{max, min}};
     }
 
 
-    static class Function implements Function2D {
+    static class FunctionSolver implements Function2D {
         Expression ex;
+        Type type;
 
-        Function(Expression ex) {
+        FunctionSolver(Expression ex, Type type) {
             this.ex = ex;
+            this.type = type;
         }
 
         public double getValue(double x) {
+            if (type == Type.HYPERBOLA && x == 0) x += 0.1E-1;
             return ex.setVariable("x", x).evaluate();
         }
     }

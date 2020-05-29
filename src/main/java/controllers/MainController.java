@@ -1,5 +1,7 @@
 package controllers;
 
+import model.ApproximationMethod;
+import model.Function;
 import model.NumericalMethods;
 import views.Chart;
 import views.MainView;
@@ -18,8 +20,14 @@ public class MainController {
     private void addActionListener(MainView view) {
 
         view.getButton().addActionListener(li -> {
-            Equation equation = dataProcessing();
+            Equation equation;
 
+            try {
+                equation = dataProcessing();
+            } catch (NumberFormatException e) {
+                view.getErrorLabel().setText("Введите коректные значения во все поля");
+                return;
+            }
             view.getView().remove(view.getPanelTable());
             JScrollPane wrapperTable = view.initTable(equation.getValueTable());
             GridBagConstraints baseConstraints = new GridBagConstraints();
@@ -28,12 +36,23 @@ public class MainController {
             baseConstraints.gridx = 0;
             baseConstraints.gridy = 1;
             view.getView().add(wrapperTable, baseConstraints);
+            Function function;
+
+            try {
+                function = new ApproximationMethod().run(equation.getValueTable());
+            } catch (ArithmeticException | IllegalArgumentException e ) {
+                e.printStackTrace();
+                view.getErrorLabel().setText("При апроксимации возникли ошибки");
+                return;
+            }
+
+            view.getMinSquareLabel().setText("Разность квадратов для этой функции: "+function.getMinSquare());
 
             if (chart != null) {
                 view.getPanelChart().remove(chart.getJPanel());
             }
 
-            chart = new Chart(equation.getValueTable());
+            chart = new Chart(function);
             view.getPanelChart().add(chart.getJPanel());
 
             view.getView().revalidate();

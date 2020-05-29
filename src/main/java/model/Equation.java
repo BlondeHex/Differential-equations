@@ -34,37 +34,17 @@ public class Equation {
                     .setVariable("x", x)
                     .setVariable("y", y);
             return (e.evaluate());
-        } catch (java.lang.ArithmeticException e){
+        } catch (ArithmeticException e){
             return 0;
         }
-    }
-
-    public int getIterations() {
-        return iterations;
     }
 
     public double[][] getValueTable() {
         return valueTable;
     }
 
-    public void showTable(){
-        for (double[] doubles : valueTable) System.out.println(doubles[0] + " " + doubles[1]);
-    }
-
-    public double getXn() {
-        return xn;
-    }
-
-    public void setXn(double xn) {
-        this.xn = xn;
-    }
-
     public double getH() {
         return h;
-    }
-
-    public void setH(double h) {
-        this.h = h;
     }
 
     public void setValueTable(double[][] valueTable) {

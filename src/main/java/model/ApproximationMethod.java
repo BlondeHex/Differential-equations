@@ -3,78 +3,93 @@ package model;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+
+import static model.Type.*;
+
 public class ApproximationMethod {
 
-    public String run(double[][] data){
-        double minSquare= 1000;
+    public Function run(double[][] data) {
+        double minSquare = (double) Integer.MAX_VALUE;
         String function = "";
-
+        Type type = null;
         String linearFunction = linear(data);
         double linearFunctionSquare = findSquareDeviations(data, linearFunction);
-        if (minSquare>linearFunctionSquare){
+        if (minSquare > linearFunctionSquare) {
             function = linearFunction;
             minSquare = linearFunctionSquare;
+            type = LINEAR;
         }
 
         String powerFunction = power(data);
-        double powerFunctionSquare = findSquareDeviations(data, powerFunction);
-        if (minSquare>powerFunctionSquare){
-            function = powerFunction;
-            minSquare = powerFunctionSquare;
+        if (!powerFunction.contains("NaN")) {
+            double powerFunctionSquare = findSquareDeviations(data, powerFunction);
+            if (minSquare > powerFunctionSquare) {
+                function = powerFunction;
+                minSquare = powerFunctionSquare;
+                type = POWER;
+            }
         }
 
         String squareFunction = square(data);
-        double squareFunctionSquare = findSquareDeviations(data, squareFunction);
-        if (minSquare>squareFunctionSquare){
-            function = squareFunction;
-            minSquare = squareFunctionSquare;
+        if (!squareFunction.contains("NaN")) {
+            double squareFunctionSquare = findSquareDeviations(data, squareFunction);
+            if (minSquare > squareFunctionSquare) {
+                function = squareFunction;
+                minSquare = squareFunctionSquare;
+                type = SQUARE;
+            }
         }
 
         String logFunction = log(data);
-        double logFunctionSquare = findSquareDeviations(data, logFunction);
-        if (minSquare>logFunctionSquare){
-            function = logFunction;
-            minSquare = logFunctionSquare;
+        if (!logFunction.contains("NaN")) {
+            double logFunctionSquare = findSquareDeviations(data, logFunction);
+            if (minSquare > logFunctionSquare) {
+                function = logFunction;
+                minSquare = logFunctionSquare;
+                type = LOG;
+            }
         }
-
         String expFunction = exp(data);
-        double expFunctionSquare = findSquareDeviations(data, expFunction);
-        if (minSquare>expFunctionSquare){
-            function = expFunction;
-            minSquare = expFunctionSquare;
+        if (!expFunction.contains("NaN")) {
+            double expFunctionSquare = findSquareDeviations(data, expFunction);
+            if (minSquare > expFunctionSquare) {
+                function = expFunction;
+                minSquare = expFunctionSquare;
+                type = EXP;
+            }
         }
 
         String hyperbolaFunction = hyperbola(data);
-        double hyperbolaFunctionSquare = findSquareDeviations(data, hyperbolaFunction);
-        if (minSquare>hyperbolaFunctionSquare)
-            function = hyperbolaFunction;
-        return function;
+        if (!hyperbolaFunction.contains("NaN")) {
+            double hyperbolaFunctionSquare = findSquareDeviations(data, hyperbolaFunction);
+            if (minSquare > hyperbolaFunctionSquare) {
+                function = hyperbolaFunction;
+                type = HYPERBOLA;
+            }
+        }
+        if (function.equals("")) throw new IllegalArgumentException("too much minSquare" + minSquare);
+        else return new Function(function, type, minSquare, data);
 
     }
 
-    private double findSquareDeviations(double[][] data, String function){
+    private double findSquareDeviations(double[][] data, String function) {
         double sum = 0;
-        for (double[] datum : data) sum += Math.pow(datum[1] - getValueFunction(function, datum[0]), 2);
+        for (double[] datum : data) {
+            sum += Math.pow(datum[1] - getValueFunction(function, datum[0]), 2);
+        }
         return sum;
     }
 
-    private double getValueFunction(String function, double x){
-        if (!function.contains("NaN")) {
-            try {
-                Expression e = new ExpressionBuilder(function)
-                        .variables("x")
-                        .build()
-                        .setVariable("x", x);
-                return (e.evaluate());
-            } catch (java.lang.ArithmeticException e) {
-                return 100;
-            }
-        } else {
-            return 100;
-        }
+    private double getValueFunction(String function, double x) {
+        Expression e = new ExpressionBuilder(function)
+                .variables("x")
+                .build()
+                .setVariable("x", x);
+        return (e.evaluate());
+
     }
 
-    private String linear(double[][] data){
+    private String linear(double[][] data) {
         double[] sum = {0.0, 0.0, 0.0, 0.0};
         for (double[] datum : data) {
             sum[0] += datum[0]; //x
@@ -86,9 +101,9 @@ public class ApproximationMethod {
         double a = (sum[0] * sum[1] - data.length * sum[2]) / del;
         double b = (sum[0] * sum[2] - sum[3] * sum[1]) / del;
         if (b >= 0) {
-            return a+"*x+"+b;
+            return a + "*x+" + b;
         } else {
-            return a+"*x"+b;
+            return a + "*x" + b;
         }
     }
 
@@ -141,14 +156,14 @@ public class ApproximationMethod {
         double a = da / d;
         double b = db / d;
         double c = dc / d;
-        String result = a+"*x^2";
+        String result = a + "*x^2";
         if (b >= 0) {
-            result += "+"+b+"*x";
+            result += "+" + b + "*x";
         } else {
-            result += b+"*x";
+            result += b + "*x";
         }
         if (c >= 0) {
-            result += "+"+c;
+            result += "+" + c;
         } else {
             result += c;
         }
@@ -160,15 +175,16 @@ public class ApproximationMethod {
         for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
+
             sum[0] += Math.log(x); //x
             sum[1] += Math.log(y); //y
             sum[2] += Math.pow(Math.log(x), 2); //x2
             sum[3] += Math.log(x) * Math.log(y); //xy
         }
 
-        double b = (data.length * sum[3] - sum[0] * sum[1]) / (data.length * sum[2] - Math.pow(sum[0],2));
+        double b = (data.length * sum[3] - sum[0] * sum[1]) / (data.length * sum[2] - Math.pow(sum[0], 2));
         double a = Math.exp(1.0 / data.length * sum[1] - b / data.length * sum[0]);
-        return a+ "* x ^ "+b;
+        return a + "* x ^ " + b;
     }
 
     private String hyperbola(double[][] data) {
@@ -200,16 +216,16 @@ public class ApproximationMethod {
             sum[0] += y * Math.log(x); //ylnx
             sum[1] += Math.log(x); //lnx
             sum[2] += y; //y
-            sum[3] += Math.pow(Math.log(x),2); //ln2x
+            sum[3] += Math.pow(Math.log(x), 2); //ln2x
         }
 
-        double b =  (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1],2));
-        double a =  1.0/data.length * sum[2] - b/data.length * sum[1];
-        String result =a+"";
+        double b = (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1], 2));
+        double a = 1.0 / data.length * sum[2] - b / data.length * sum[1];
+        String result = a + "";
         if (b >= 0) {
-            result+="+"+b +"*log(x)";
-        } else if (b!=0) {
-            result+=b+"*log(x)";
+            result += "+" + b + "*log(x)";
+        } else if (b != 0) {
+            result += b + "*log(x)";
         }
         return result;
     }
@@ -223,25 +239,25 @@ public class ApproximationMethod {
             sum[0] += x * Math.log(y); //xlny
             sum[1] += x; //x
             sum[2] += Math.log(y); //lny
-            sum[3] +=Math.pow(x,2); //x2
+            sum[3] += Math.pow(x, 2); //x2
         }
 
-        double b =  (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1],2));
-        double a =  1.0/data.length * sum[2] - b/data.length * sum[1];
-        String result ="e^("+a;
+        double b = (data.length * sum[0] - sum[1] * sum[2]) / (data.length * sum[3] - Math.pow(sum[1], 2));
+        double a = 1.0 / data.length * sum[2] - b / data.length * sum[1];
+        String result = "e^(" + a;
         if (b >= 0) {
-            result+="+"+b+"* x)";
-        } else if (b!=0){
-            result+=b +"* x)";
+            result += "+" + b + "* x)";
+        } else if (b != 0) {
+            result += b + "* x)";
         }
         return result;
     }
 
 
     private double determinant(double[][] a) {
-        double sum = a[0][0]*(a[1][1]*a[2][2]-a[1][2]*a[2][1]);
-        sum-= a[1][0]*(a[0][1]*a[2][2]-a[0][2]*a[2][1]);
-        sum+= a[2][0]*(a[0][1]*a[1][2]-a[0][2]*a[1][1]);
+        double sum = a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]);
+        sum -= a[1][0] * (a[0][1] * a[2][2] - a[0][2] * a[2][1]);
+        sum += a[2][0] * (a[0][1] * a[1][2] - a[0][2] * a[1][1]);
         return sum;
     }
 }
