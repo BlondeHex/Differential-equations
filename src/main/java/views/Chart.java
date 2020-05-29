@@ -14,40 +14,38 @@ import org.jfree.data.function.Function2D;
 import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
-import utils.Pair;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-public class ChartView {
-    private JFrame window;
+public class Chart {
     private JPanel jPanel;
+    private XYDataset first;
+    private DefaultXYDataset points;
+    private double[][] data;
+    private String function;
 
-    public ChartView(Double[][] data){
-        setElement(data);
 
-        window = new JFrame();
-        setSetting();
-        window.add(jPanel);
-    }
-
-    private void setSetting(){
-        window.setVisible(true);
-        window.setBounds(400,200,900,700);
-    }
-
-    private void setElement(Double[][] data){
-        jPanel = new JPanel();
+    public Chart(double[][] data){
+        this.data = data;
         ApproximationMethod approximationMethod = new ApproximationMethod();
-        String function = approximationMethod.run(data);
-        jPanel.add(createPanel(function, data));
+        function = approximationMethod.run(data);
+        setDataset();
+        jPanel = setElement();
+
     }
 
 
-    public JPanel createPanel(String function1, Double [][] data) {
-        JFreeChart chart = createChart(createDataset(function1, data));
+    private JPanel setElement(){
+        JPanel jPanel = new JPanel();
+        jPanel.add(createPanel());
+        return jPanel;
+    }
+
+
+    private JPanel createPanel() {
+        JFreeChart chart = createChart();
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
         chartPanel.addMouseMotionListener(new MouseMotionAdapter() {
@@ -63,47 +61,43 @@ public class ChartView {
         return chartPanel;
     }
 
-    public Pair<XYDataset, DefaultXYDataset> createDataset(String function1,  Double [][] data) {
+    private void setDataset() {
 
-        Expression formula1 = new ExpressionBuilder(function1).variable("x").build();
-        Pair<Double, Double> borders = getLeftAndRightBorders(data);
-        Double leftBorder, rightBorder;
+        Expression formula1 = new ExpressionBuilder(function).variable("x").build();
+        double[][] borders = getLeftAndRightBorders();
+        double leftBorder, rightBorder;
 
-            leftBorder = borders.snd - 15;
-            rightBorder = borders.fst + 15;
-
-        XYDataset first = DatasetUtilities.sampleFunction2D(
+            leftBorder = borders[0][1] - 15;
+            rightBorder = borders[0][0] + 15;
+            first = DatasetUtilities.sampleFunction2D(
                 new Function(formula1),
                 leftBorder,
                 rightBorder,
                 300,
-                function1
+                function
         );
 
-
-        DefaultXYDataset points = new DefaultXYDataset();
-        double x[] = new double[data.length];
-        double y[] = new double[data.length];
-        int inc = 0;
+            points = new DefaultXYDataset();
+        double[] x = new double[data.length];
+        double[] y = new double[data.length];
         for (int i = 0; i<data.length; i++) {
                 y[i] = data[i][0];
                 x[i] = data[i][1];
         }
 
-        double p[][] = { y , x };
+        double[][] p = {y, x};
 
         points.addSeries("Точки", p);
-        return Pair.of(first, points);
     }
 
 
-    private JFreeChart createChart(Pair<XYDataset, DefaultXYDataset> dataset) {
+    private JFreeChart createChart() {
 
         JFreeChart chart = ChartFactory.createXYLineChart(
                 "Графики",
                 "X",
                 "Y",
-                dataset.snd,
+                points,
                 PlotOrientation.VERTICAL,
                 true,
                 true,
@@ -117,7 +111,7 @@ public class ChartView {
         XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) plot.getRenderer(0);
         r.setSeriesLinesVisible(0, false);
 
-        plot.setDataset(1, dataset.fst);
+        plot.setDataset(1, first);
         plot.setRenderer(1, new StandardXYItemRenderer());
 
 
@@ -127,21 +121,21 @@ public class ChartView {
         return chart;
     }
 
-    private Pair<Double,Double> getLeftAndRightBorders(Double data[] []) {
-        Double max = -Integer.MAX_VALUE + 0.0;
-        Double min = Integer.MAX_VALUE + 0.0;
-        for (Double[] i : data) {
+    private double[][] getLeftAndRightBorders() {
+        double max = -Integer.MAX_VALUE + 0.0;
+        double min = Integer.MAX_VALUE + 0.0;
+        for (double[] i : data) {
             if (i[0]>max) max = i[0];
             if (i[0]<min) min = i[0];
         }
-        return Pair.of(max,min);
+        return new double[][]{{max,min}};
     }
 
 
     static class Function implements Function2D {
         Expression ex;
 
-        public Function(Expression ex) {
+        Function(Expression ex) {
             this.ex = ex;
         }
 
@@ -150,5 +144,7 @@ public class ChartView {
         }
     }
 
-
+    public JPanel getJPanel() {
+        return jPanel;
+    }
 }

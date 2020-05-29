@@ -1,28 +1,47 @@
 package controllers;
 
 import model.NumericalMethods;
-import utils.Pair;
-import views.ChartView;
+import views.Chart;
 import views.MainView;
 import model.Equation;
-import views.TableView;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class MainController {
     private MainView view;
+    private Chart chart;
     public MainController(){
-        view = new MainView(600,250);
+        view = new MainView(1200,700);
         addActionListener(view);
     }
     private void addActionListener(MainView view) {
 
         view.getButton().addActionListener(li -> {
-            Pair<Double[][], String> data = dataProcessing();
-            new ChartView(data.fst);
-            new TableView(data.fst);
+            Equation equation = dataProcessing();
+
+            view.getView().remove(view.getPanelTable());
+            JScrollPane wrapperTable = view.initTable(equation.getValueTable());
+            GridBagConstraints baseConstraints = new GridBagConstraints();
+            view.setPanelTable(wrapperTable);
+
+            baseConstraints.gridx = 0;
+            baseConstraints.gridy = 1;
+            view.getView().add(wrapperTable, baseConstraints);
+
+            if (chart != null) {
+                view.getPanelChart().remove(chart.getJPanel());
+            }
+
+            chart = new Chart(equation.getValueTable());
+            view.getPanelChart().add(chart.getJPanel());
+
+            view.getView().revalidate();
+            view.getView().repaint();
         });
     }
 
-    private Pair<Double[][], String> dataProcessing(){
+    private Equation dataProcessing(){
         double x0 = Double.parseDouble(view.getBeginXField().getText());
         double y0 = Double.parseDouble(view.getBeginYField().getText());
         double xn = Double.parseDouble(view.getEndXField().getText());
@@ -31,6 +50,6 @@ public class MainController {
         Equation equation = new Equation(x0,y0,xn,h,function);
         NumericalMethods numericalMethods = new NumericalMethods();
         numericalMethods.run(equation);
-        return Pair.of(equation.getValueTable(), function);
+        return equation;
     }
 }

@@ -1,10 +1,13 @@
 package views;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Vector;
 
 public class MainView {
     private JFrame window;
-    private JPanel jPanel;
+    private JPanel view;
+    private JScrollPane panelTable;
+    private JPanel panelChart;
     private int width;
     private int height;
     private JTextField functionField;
@@ -22,7 +25,7 @@ public class MainView {
         setElement();
 
         window = new JFrame("Educational work №4");
-        window.getContentPane().add(jPanel);
+        window.getContentPane().add(view);
         setSetting();
 
     }
@@ -35,8 +38,27 @@ public class MainView {
     }
 
     private void setElement(){
-        jPanel = new JPanel();
-        jPanel.setLayout(new GridBagLayout());
+        view = new JPanel();
+        view.setLayout(new GridBagLayout());
+        GridBagConstraints baseConstraints = new GridBagConstraints();
+        JPanel inputPanel = setInputPanel();
+        panelTable = initTable(new double[][]{});
+
+        panelChart = new JPanel();
+        panelChart.setLayout(new GridBagLayout());
+
+        baseConstraints.gridwidth=2;
+        view.add(inputPanel, baseConstraints);
+        baseConstraints.gridy = 1;
+        baseConstraints.gridx = 0;
+        view.add(panelTable, baseConstraints);
+        baseConstraints.gridx = 1;
+        view.add(panelChart, baseConstraints);
+    }
+
+    private JPanel setInputPanel(){
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridBagLayout());
         GridBagConstraints baseConstraints = new GridBagConstraints();
 
         JLabel descriptionFunctionLabel = new JLabel("y' = f(x,y) ");
@@ -57,49 +79,103 @@ public class MainView {
         JLabel accuracyLabel = new JLabel("Точность: ");
         accuracyField = new JTextField(15);
 
-        button = new JButton("Ок");
+        button = new JButton("Построить график");
 
-        jPanel.add(descriptionFunctionLabel);
+        inputPanel.add(descriptionFunctionLabel);
 
         baseConstraints.gridy = 1;
         baseConstraints.gridx = 0;
-        jPanel.add(functionLabel, baseConstraints);
+        inputPanel.add(functionLabel, baseConstraints);
         baseConstraints.gridy = 1;
         baseConstraints.gridx = 1;
-        jPanel.add(functionField, baseConstraints);
+        inputPanel.add(functionField, baseConstraints);
 
         baseConstraints.gridx = 0;
         baseConstraints.gridy = 2;
-        jPanel.add(descriptionBeginLabel, baseConstraints);
+        inputPanel.add(descriptionBeginLabel, baseConstraints);
         baseConstraints.gridy = 3;
         baseConstraints.gridx = 0;
-        jPanel.add(beginXLabel, baseConstraints);
+        inputPanel.add(beginXLabel, baseConstraints);
         baseConstraints.gridy = 3;
         baseConstraints.gridx = 1;
-        jPanel.add(beginXField, baseConstraints);
+        inputPanel.add(beginXField, baseConstraints);
         baseConstraints.gridy = 3;
         baseConstraints.gridx = 2;
-        jPanel.add(beginYLabel, baseConstraints);
+        inputPanel.add(beginYLabel, baseConstraints);
         baseConstraints.gridx = 3;
-        jPanel.add(beginYField, baseConstraints);
+        inputPanel.add(beginYField, baseConstraints);
 
         baseConstraints.gridy = 4;
         baseConstraints.gridx = 0;
-        jPanel.add(endXLabel, baseConstraints);
+        inputPanel.add(endXLabel, baseConstraints);
         baseConstraints.gridy = 4;
         baseConstraints.gridx = 1;
-        jPanel.add(endXField, baseConstraints);
+        inputPanel.add(endXField, baseConstraints);
 
         baseConstraints.gridy = 5;
         baseConstraints.gridx = 0;
-        jPanel.add(accuracyLabel, baseConstraints);
+        inputPanel.add(accuracyLabel, baseConstraints);
         baseConstraints.gridy = 5;
         baseConstraints.gridx = 1;
-        jPanel.add(accuracyField, baseConstraints);
+        inputPanel.add(accuracyField, baseConstraints);
 
         baseConstraints.gridy = 6;
-        baseConstraints.gridx = 3;
-        jPanel.add(button, baseConstraints);
+        baseConstraints.gridx = 1;
+        inputPanel.add(button, baseConstraints);
+        return inputPanel;
+    }
+
+    public JScrollPane initTable(double[][] data) {
+        //Vector of swing documentation
+        int size = data.length;
+        Vector columnNames = new Vector<String>(3);
+        columnNames.addElement("№");
+        columnNames.addElement("X");
+        columnNames.addElement("Y");
+
+        Vector<Vector<String>> dataTable = new Vector<>(size);
+        for (int i = 0; i < size; i++) {
+            Vector preData = new Vector<String>(3);
+            preData.addElement(i+1);
+            preData.addElement(data[i][0]);
+            preData.addElement(data[i][1]);
+            dataTable.addElement(preData);
+        }
+
+        JTable valueTable = new JTable(dataTable, columnNames);
+        valueTable.getTableHeader().setOpaque(false);
+        valueTable.setEnabled(false);
+        JPanel panelWrapperTable = new JPanel();
+        panelWrapperTable.setLayout(new BorderLayout());
+        panelWrapperTable.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        panelWrapperTable.add(valueTable.getTableHeader(), BorderLayout.NORTH);
+        panelWrapperTable.add(valueTable, BorderLayout.CENTER);
+
+        JScrollPane scroller = new JScrollPane(panelWrapperTable);
+        int height = 45;
+        if (data.length!=0) {
+            if (data.length - 1 < 20) {
+                height += (data.length - 1) * 16;
+            } else {
+                height += 20 * 16;
+            }
+        }
+        scroller.setPreferredSize(new Dimension(300, height));
+        scroller.setBorder(null);
+        return scroller;
+    }
+
+    public JScrollPane getPanelTable() {
+        return panelTable;
+    }
+
+    public void setPanelTable(JScrollPane panelTable) {
+        this.panelTable = panelTable;
+    }
+
+
+    public JPanel getView() {
+        return view;
     }
 
     public JButton getButton() {
@@ -125,4 +201,10 @@ public class MainView {
     public JTextField getFunctionField() {
         return functionField;
     }
+
+
+    public JPanel getPanelChart() {
+        return panelChart;
+    }
+
 }

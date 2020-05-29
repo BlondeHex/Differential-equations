@@ -5,7 +5,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class ApproximationMethod {
 
-    public String run(Double[][] data){
+    public String run(double[][] data){
         double minSquare= 1000;
         String function = "";
 
@@ -52,9 +52,9 @@ public class ApproximationMethod {
 
     }
 
-    private double findSquareDeviations(Double[][] data, String function){
+    private double findSquareDeviations(double[][] data, String function){
         double sum = 0;
-        for (Double[] datum : data) sum += Math.pow(datum[1] - getValueFunction(function, datum[0]), 2);
+        for (double[] datum : data) sum += Math.pow(datum[1] - getValueFunction(function, datum[0]), 2);
         return sum;
     }
 
@@ -74,9 +74,9 @@ public class ApproximationMethod {
         }
     }
 
-    private String linear(Double[][] data){
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (Double[] datum : data) {
+    private String linear(double[][] data){
+        double[] sum = {0.0, 0.0, 0.0, 0.0};
+        for (double[] datum : data) {
             sum[0] += datum[0]; //x
             sum[1] += datum[1]; //y
             sum[2] += datum[0] * datum[1]; //xy
@@ -92,9 +92,9 @@ public class ApproximationMethod {
         }
     }
 
-    private String square(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-        for (Double[] datum : data) {
+    private String square(double[][] data) {
+        double[] sum = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
             sum[0] += x; //x
@@ -105,7 +105,7 @@ public class ApproximationMethod {
             sum[5] += x * y; //xy
             sum[6] += Math.pow(x, 2.0) * y; //x2y
         }
-        Double[][] matrix = new Double[3][3];
+        double[][] matrix = new double[3][3];
         matrix[0][0] = sum[2];
         matrix[0][1] = sum[0];
         matrix[0][2] = data.length * 1.0;
@@ -155,9 +155,9 @@ public class ApproximationMethod {
         return result;
     }
 
-    private String power(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (Double[] datum : data) {
+    private String power(double[][] data) {
+        double[] sum = {0.0, 0.0, 0.0, 0.0};
+        for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
             sum[0] += Math.log(x); //x
@@ -171,9 +171,9 @@ public class ApproximationMethod {
         return a+ "* x ^ "+b;
     }
 
-    private String hyperbola(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (Double[] datum : data) {
+    private String hyperbola(double[][] data) {
+        double[] sum = {0.0, 0.0, 0.0, 0.0};
+        for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
             sum[0] += 1 / x; //x
@@ -192,9 +192,9 @@ public class ApproximationMethod {
     }
 
 
-    private String log(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
-        for (Double[] datum : data) {
+    private String log(double[][] data) {
+        double[] sum = {0.0, 0.0, 0.0, 0.0};
+        for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
             sum[0] += y * Math.log(x); //ylnx
@@ -214,10 +214,10 @@ public class ApproximationMethod {
         return result;
     }
 
-    private String exp(Double[][] data) {
-        Double[] sum = {0.0, 0.0, 0.0, 0.0};
+    private String exp(double[][] data) {
+        double[] sum = {0.0, 0.0, 0.0, 0.0};
 
-        for (Double[] datum : data) {
+        for (double[] datum : data) {
             double x = datum[0];
             double y = datum[1];
             sum[0] += x * Math.log(y); //xlny
@@ -238,7 +238,7 @@ public class ApproximationMethod {
     }
 
 
-    private double determinant(Double[][] a) {
+    private double determinant(double[][] a) {
         double sum = a[0][0]*(a[1][1]*a[2][2]-a[1][2]*a[2][1]);
         sum-= a[1][0]*(a[0][1]*a[2][2]-a[0][2]*a[2][1]);
         sum+= a[2][0]*(a[0][1]*a[1][2]-a[0][2]*a[1][1]);

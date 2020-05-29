@@ -8,15 +8,14 @@ public class Equation {
     private double xn;
     private double h;
     private String function;
-    private Double[][] valueTable;
+    private double[][] valueTable;
     private int iterations;
 
     public Equation(double x0, double y0, double xn, double h, String function){
 
         this.h=Math.pow(h, 0.25);
-        //this.h = h;
         iterations = (int)(Math.ceil((xn-x0)/this.h));
-        valueTable = new Double[iterations+1][2];
+        valueTable = new double[iterations+1][2];
         valueTable[0][0]= x0;
         valueTable[0][1]= y0;
         this.xn=xn;
@@ -44,12 +43,12 @@ public class Equation {
         return iterations;
     }
 
-    public Double[][] getValueTable() {
+    public double[][] getValueTable() {
         return valueTable;
     }
 
     public void showTable(){
-        for (Double[] doubles : valueTable) System.out.println(doubles[0] + " " + doubles[1]);
+        for (double[] doubles : valueTable) System.out.println(doubles[0] + " " + doubles[1]);
     }
 
     public double getXn() {
@@ -68,7 +67,7 @@ public class Equation {
         this.h = h;
     }
 
-    public void setValueTable(Double[][] valueTable) {
+    public void setValueTable(double[][] valueTable) {
         this.valueTable = valueTable;
     }
 }

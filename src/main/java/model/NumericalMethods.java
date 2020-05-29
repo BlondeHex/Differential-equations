@@ -4,7 +4,7 @@ import org.apache.commons.math3.util.Precision;
 
 public class NumericalMethods {
     private Equation equation;
-    private Double[][] valueTable;
+    private double[][] valueTable;
 
     public void run(Equation equation){
         this.equation = equation;
