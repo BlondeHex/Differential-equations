@@ -14,6 +14,7 @@ public class ApproximationMethod {
         Type type = null;
         String linearFunction = linear(data);
         double linearFunctionSquare = findSquareDeviations(data, linearFunction);
+
         if (minSquare > linearFunctionSquare) {
             function = linearFunction;
             minSquare = linearFunctionSquare;

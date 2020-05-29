@@ -142,7 +142,7 @@ public class Chart {
         }
 
         public double getValue(double x) {
-            if (type == Type.HYPERBOLA && x == 0) x += 0.1E-1;
+            if ((type == Type.HYPERBOLA || type == Type.POWER || type == Type.EXP) && x==0) x+=0.1E-1;
             return ex.setVariable("x", x).evaluate();
         }
     }

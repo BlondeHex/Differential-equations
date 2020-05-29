@@ -1,6 +1,7 @@
 package model;
 
 public class Function {
+
     private String function;
     private Type type;
     private double minSquare;

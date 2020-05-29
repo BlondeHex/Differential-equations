@@ -21,13 +21,15 @@ public class MainController {
 
         view.getButton().addActionListener(li -> {
             Equation equation;
-
+            view.getMinSquareLabel().setText("");
+            view.getErrorLabel().setText("");
             try {
                 equation = dataProcessing();
             } catch (NumberFormatException e) {
                 view.getErrorLabel().setText("Введите коректные значения во все поля");
                 return;
             }
+
             view.getView().remove(view.getPanelTable());
             JScrollPane wrapperTable = view.initTable(equation.getValueTable());
             GridBagConstraints baseConstraints = new GridBagConstraints();
@@ -36,8 +38,8 @@ public class MainController {
             baseConstraints.gridx = 0;
             baseConstraints.gridy = 1;
             view.getView().add(wrapperTable, baseConstraints);
-            Function function;
 
+            Function function;
             try {
                 function = new ApproximationMethod().run(equation.getValueTable());
             } catch (ArithmeticException | IllegalArgumentException e ) {
