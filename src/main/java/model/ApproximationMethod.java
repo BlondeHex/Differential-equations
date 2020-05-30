@@ -69,7 +69,7 @@ public class ApproximationMethod {
             }
         }
         if (function.equals("")) throw new IllegalArgumentException("too much minSquare" + minSquare);
-        else return new Function(function, type, minSquare, data);
+        else return new Function(function, type,  data);
 
     }
 

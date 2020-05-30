@@ -21,7 +21,6 @@ public class MainController {
 
         view.getButton().addActionListener(li -> {
             Equation equation;
-            view.getMinSquareLabel().setText("");
             view.getErrorLabel().setText("");
             try {
                 equation = dataProcessing();
@@ -48,7 +47,6 @@ public class MainController {
                 return;
             }
 
-            view.getMinSquareLabel().setText("Разность квадратов для этой функции: "+function.getMinSquare());
 
             if (chart != null) {
                 view.getPanelChart().remove(chart.getJPanel());

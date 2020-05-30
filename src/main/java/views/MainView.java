@@ -5,14 +5,9 @@ import java.util.Vector;
 
 public class MainView {
     private JLabel errorLabel;
-    private JLabel minSquareLabel;
-
-    private JFrame window;
     private JPanel view;
     private JScrollPane panelTable;
     private JPanel panelChart;
-    private int width;
-    private int height;
     private JTextField functionField;
     private JTextField beginXField;
     private JTextField beginYField;
@@ -23,16 +18,14 @@ public class MainView {
 
     public MainView(int width, int height){
 
-        this.width=width;
-        this.height=height;
         setElement();
 
-        window = new JFrame("Educational work №4");
+        JFrame window = new JFrame("Educational work №4");
         window.getContentPane().add(view);
-        setSetting();
+        setSetting(width,height,window);
 
     }
-    private void setSetting(){
+    private void setSetting(int width, int height, JFrame window){
         window.setVisible(true);
         window.setDefaultCloseOperation(window.EXIT_ON_CLOSE);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -45,9 +38,7 @@ public class MainView {
         view.setLayout(new GridBagLayout());
         GridBagConstraints baseConstraints = new GridBagConstraints();
         JPanel inputPanel = setInputPanel();
-        errorLabel = new JLabel("");
-        minSquareLabel = new JLabel("");
-        errorLabel.setForeground(Color.red);
+
         panelTable = initTable(new double[][]{});
 
         panelChart = new JPanel();
@@ -57,11 +48,9 @@ public class MainView {
         view.add(inputPanel, baseConstraints);
         baseConstraints.gridy = 1;
         baseConstraints.gridx = 0;
-        view.add(errorLabel);
         view.add(panelTable, baseConstraints);
         baseConstraints.gridx = 1;
         view.add(panelChart, baseConstraints);
-        view.add(minSquareLabel);
     }
 
     private JPanel setInputPanel(){
@@ -88,6 +77,9 @@ public class MainView {
         accuracyField = new JTextField(15);
 
         button = new JButton("Построить график");
+
+        errorLabel = new JLabel("");
+        errorLabel.setForeground(Color.red);
 
         inputPanel.add(descriptionFunctionLabel);
 
@@ -130,6 +122,10 @@ public class MainView {
         baseConstraints.gridy = 6;
         baseConstraints.gridx = 1;
         inputPanel.add(button, baseConstraints);
+
+        baseConstraints.gridy = 7;
+        baseConstraints.gridx = 1;
+        inputPanel.add(errorLabel, baseConstraints);
         return inputPanel;
     }
 
@@ -212,9 +208,6 @@ public class MainView {
 
     public JLabel getErrorLabel() {
         return errorLabel;
-    }
-    public JLabel getMinSquareLabel()  {
-        return minSquareLabel;
     }
 
     public JPanel getPanelChart() {

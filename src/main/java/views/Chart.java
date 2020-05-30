@@ -63,7 +63,6 @@ public class Chart {
     }
 
     private void setDataset() {
-        System.out.println(function.getFunction());
         Expression formula1 = new ExpressionBuilder(function.getFunction()).variable("x").build();
         double[][] borders = getLeftAndRightBorders();
         double leftBorder, rightBorder;
